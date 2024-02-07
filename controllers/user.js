@@ -81,7 +81,7 @@ export const getProfile = async (req, res) => {
     }
 }
 
-export const updateProfile = async (req, res) => {
+export const updatePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
         const user = req.user;
