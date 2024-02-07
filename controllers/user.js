@@ -23,8 +23,6 @@ export const register = async (req, res) => {
         })
     }
 }
-
-
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body
@@ -51,7 +49,6 @@ export const login = async (req, res) => {
         })
     }
 }
-
 export const logout = async (req, res) => {
     try {
         res.status(200).clearCookie("token", {
@@ -69,7 +66,6 @@ export const logout = async (req, res) => {
         })
     }
 }
-
 export const getProfile = async (req, res) => {
     try {
         res.status(200).json({
@@ -85,3 +81,46 @@ export const getProfile = async (req, res) => {
     }
 }
 
+export const updateProfile = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const user = req.user;
+
+        // Verify old password
+        const matchedOldPassword = await bcrypt.compare(oldPassword, user.password);
+        if (!matchedOldPassword) {
+            return res.status(401).json({
+                success: false,
+                message: "Old password not correct"
+            });
+        }
+       
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password in the database
+        const updatedUser = await userModel.findByIdAndUpdate(
+            user._id,
+            { password: hashedPassword },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully."
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred updating the profile."
+        });
+    }
+};

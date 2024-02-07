@@ -12,5 +12,4 @@ export const setCookie = (user, res, message, code) => {
         success: true,
         message
     })
-    console.log('Headers:', res.getHeaders());
 }
