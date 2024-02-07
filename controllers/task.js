@@ -108,19 +108,3 @@ export const getAllTask = async (req, res) => {
         })
     }
 }
-export const categoriesTask = async (req, res) => {
-    try {
-        const category = req.params.category
-        console.log(category);
-        res.status(200).json({
-            success: true,
-            message: "This category task fetched"
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            success: false,
-            message: "An error occurred to get this category task"
-        })
-    }
-}
