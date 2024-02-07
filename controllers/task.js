@@ -25,7 +25,6 @@ export const createTask = async (req, res) => {
         })
     }
 }
-
 export const updateTask = async (req, res) => {
     try {
         const taskId = req.params.id;
@@ -93,8 +92,9 @@ export const deleteTask = async (req, res) => {
 }
 export const getAllTask = async (req, res) => {
     try {
-
-        let tasks = await taskModel.find()
+        const user = req.user;
+        const userId = user._id;
+        const tasks = await taskModel.find({ user: userId });
         res.status(200).json({
             success: true,
             tasks,
@@ -105,6 +105,22 @@ export const getAllTask = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "An error occurred to fetch all task"
+        })
+    }
+}
+export const categoriesTask = async (req, res) => {
+    try {
+        const category = req.params.category
+        console.log(category);
+        res.status(200).json({
+            success: true,
+            message: "This category task fetched"
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred to get this category task"
         })
     }
 }
