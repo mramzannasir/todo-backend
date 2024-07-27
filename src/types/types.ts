@@ -4,3 +4,9 @@ export interface UserTypes {
   password: string;
   role: string;
 }
+export interface TodoTypes {
+  title: string;
+  description: string;
+  status: string;
+  createdAt: Date;
+}

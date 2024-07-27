@@ -7,6 +7,7 @@ import User from "../models/user.js";
 import { ZodError } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export const signupUser = async (
   req: Request,
@@ -29,8 +30,7 @@ export const signupUser = async (
       saltRounds
     );
     validatedData.password = hashedPassword;
-    const newUser = new User(validatedData);
-    await newUser.save();
+    const newUser = await User.create(validatedData);
     res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -56,13 +56,12 @@ export const signupUser = async (
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = loginValidationSchema.parse(req.body);
-
     const user = await User.findOne({ email: validatedData.email });
     console.log(user);
     if (!user) {
       res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "User not found please signup",
       });
       return;
     }
@@ -143,9 +142,65 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export const getUser = async () => {
-  console.log("get user");
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: "User not exist please login",
+      });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: "Some thing went wrong to find user",
+    });
+    console.log(
+      "Some thing went wrong to find user please try late again",
+      error
+    );
+  }
 };
-export const deleteUser = () => {
-  console.log("delete user");
+
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+      return;
+    }
+
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error during deleting user:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the user",
+    });
+  }
 };
