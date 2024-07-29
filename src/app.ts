@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import userRoutes from "./routes/user.js";
 import todoRoutes from "./routes/todo.js";
 import cookieParser from "cookie-parser";
